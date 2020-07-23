@@ -1,3 +1,10 @@
+mod app;
+mod parse;
+
 fn main() {
-    println!("Hello, world!");
+    let params = app::params();
+    
+    println!("Using input file name: {}", params.input);
+    
+
 }
