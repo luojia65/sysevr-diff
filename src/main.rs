@@ -18,8 +18,10 @@ fn main() -> Result<()> {
     let code_slices = parse::code_slices(&content);
 
     for a in code_slices {
-        println!("{}", a);
-        println!("==========");
+        println!("new code slice!");
+        for i in format::add_if_return(a) {
+            println!("{}", i.if_content);
+        }
     }
 
     Ok(())
