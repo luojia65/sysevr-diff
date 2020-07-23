@@ -20,7 +20,7 @@ fn main() -> Result<()> {
     for a in code_slices {
         println!("new code slice!");
         for i in format::add_if_return(a) {
-            println!("{}", i.if_content);
+            println!("{}", i.condition);
         }
     }
 
