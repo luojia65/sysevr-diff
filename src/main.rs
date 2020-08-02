@@ -1,6 +1,7 @@
 mod app;
 mod parse;
 mod format;
+mod gen;
 
 use std::fs::{self, File};
 use std::path::Path;

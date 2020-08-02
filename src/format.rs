@@ -18,7 +18,7 @@ fn add_lines(input: &str) -> impl Iterator<Item = &str> {
         })
 }
 
-#[derive(Debug)]
+#[derive(Clone, Debug)]
 pub struct AddIfReturn<'a> {
     pub condition: &'a str
 }
@@ -49,7 +49,7 @@ pub fn add_if_return(input: &str) -> Vec<AddIfReturn> {
 
 */
 
-#[derive(Debug)]
+#[derive(Clone, Debug)]
 pub struct ModifyWhileFor<'a> {
     pub mark: &'a str, // "for" or "while"
     pub cond_sub: &'a str,
@@ -103,7 +103,7 @@ pub fn modify_while_for(input: &str) -> Vec<ModifyWhileFor> {
     ret
 }
 
-#[derive(Debug)]
+#[derive(Clone, Debug)]
 pub struct ModifyIf<'a> {
     pub cond_sub: &'a str,
     pub cond_add: &'a str,
@@ -152,7 +152,7 @@ pub fn modify_if(input: &str) -> Vec<ModifyIf> {
     ret
 }
 
-#[derive(Debug)]
+#[derive(Clone, Debug)]
 pub struct ModifyValueAssign<'a> {
     pub sub_left: &'a str,
     pub sub_right: &'a str,
