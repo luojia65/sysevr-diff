@@ -50,14 +50,14 @@ pub fn add_if_return(input: &str) -> Vec<AddIfReturn> {
 */
 
 #[derive(Debug)]
-pub struct WhileOrFor<'a> {
+pub struct ModifyWhileFor<'a> {
     pub mark: &'a str, // "for" or "while"
     pub cond_sub: &'a str,
     pub cond_add: &'a str,
     pub block: String,
 }
 
-pub fn while_or_for(input: &str) -> Vec<WhileOrFor> {
+pub fn modify_while_for(input: &str) -> Vec<ModifyWhileFor> {
     let mut ret = Vec::new();
     let mut iter = input.lines().peekable();
     while let Some(cur) = iter.next() {
@@ -88,7 +88,7 @@ pub fn while_or_for(input: &str) -> Vec<WhileOrFor> {
                 // dbg!(mark);
                 // dbg!(cond_sub);
                 // dbg!(cond_add);
-                let ans = WhileOrFor {
+                let ans = ModifyWhileFor {
                     mark,
                     cond_sub,
                     cond_add,
@@ -102,6 +102,101 @@ pub fn while_or_for(input: &str) -> Vec<WhileOrFor> {
     }
     ret
 }
+
+#[derive(Debug)]
+pub struct ModifyIf<'a> {
+    pub cond_sub: &'a str,
+    pub cond_add: &'a str,
+}
+
+pub fn modify_if(input: &str) -> Vec<ModifyIf> {
+    let mut ret = Vec::new();
+    let mut iter = input.lines().peekable();
+    while let Some(cur) = iter.next() {
+        let nxt = iter.peek();
+        if let Some(nxt) = nxt {
+            if !(cur.starts_with('-') && nxt.starts_with('+')) {
+                continue
+            }
+            // dbg!(cur);
+            // dbg!(nxt);
+            let (_sub, cur_1) = cur.split_at(1);
+            let (_add, nxt_1) = nxt.split_at(1);
+            if !cur_1.trim().starts_with("if") {
+                continue
+            }
+            // dbg!(cur_1);
+            let idx_start = cur_1.find("(");
+            let idx_end = cur_1.rfind(")");
+            let idx_start_2 = nxt_1.find("(");
+            let idx_end_2 = nxt_1.rfind(")");
+            if let (Some(idx_start), Some(idx_end), Some(idx_start_2), Some(idx_end_2)) = 
+                (idx_start, idx_end, idx_start_2, idx_end_2) 
+            {
+                let cond_sub = &cur_1[(idx_start + 1)..idx_end];
+                let cond_add = &nxt_1[(idx_start_2 + 1)..idx_end_2];
+                // dbg!(mark);
+                // dbg!(cond_sub);
+                // dbg!(cond_add);
+                let ans = ModifyIf {
+                    cond_sub,
+                    cond_add,
+                    // block: String::new(), // todo
+                };
+                ret.push(ans);
+            }
+        } else {
+            continue
+        }
+    }
+    ret
+}
+
+#[derive(Debug)]
+pub struct ModifyValueAssign<'a> {
+    pub sub_left: &'a str,
+    pub sub_right: &'a str,
+    pub add_left: &'a str,
+    pub add_right: &'a str,
+}
+
+pub fn modify_value_assign(input: &str) -> Vec<ModifyValueAssign> {
+    let mut ret = Vec::new();
+    let mut iter = input.lines().peekable();
+    while let Some(cur) = iter.next() {
+        let nxt = iter.peek();
+        if let Some(nxt) = nxt {
+            if !(cur.ends_with(';') && nxt.ends_with(';')) {
+                continue
+            }
+            let cur_1 = &cur[1..cur.len() - 1];
+            let nxt_1 = &nxt[1..nxt.len() - 1];
+            let idx1 = cur_1.find("=");
+            let idx2 = nxt_1.find("=");
+
+            if let (Some(idx1), Some(idx2)) = (idx1, idx2) {
+                let (al, ar) = cur_1.split_at(idx1);
+                let (_eq, ar) = ar.split_at(1);
+                let (sl, sr) = nxt_1.split_at(idx2);
+                let (_eq, sr) = sr.split_at(1);
+                // dbg!(mark);
+                // dbg!(cond_sub);
+                // dbg!(cond_add);
+                let ans = ModifyValueAssign {
+                    sub_left: sl.trim(),
+                    sub_right: sr.trim(),
+                    add_left: al.trim(),
+                    add_right: ar.trim(),
+                };
+                ret.push(ans);
+            }
+        } else {
+            continue
+        }
+    }
+    ret
+}
+
 
 /*
     if(val op val)，而且左边是变量，左边的val是关键变量

@@ -44,7 +44,13 @@ fn main() -> Result<()> {
                 for i in format::add_if_return(a) {
                     dbg!(i);
                 }
-                for i in format::while_or_for(a) {
+                for i in format::modify_while_for(a) {
+                    dbg!(i);
+                }
+                for i in format::modify_if(a) {
+                    dbg!(i);
+                }
+                for i in format::modify_value_assign(a) {
                     dbg!(i);
                 }
             }
