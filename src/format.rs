@@ -42,13 +42,65 @@ pub fn add_if_return(input: &str) -> Vec<AddIfReturn> {
     ans
 } 
 
+/*
+
+-    while (len > 0) {
++    while (len > 0 && --maxloop > 0) {
+
+*/
+
+#[derive(Debug)]
 pub struct WhileOrFor<'a> {
-    pub condition: &'a str,
-    pub block: &'a str,
+    pub mark: &'a str, // "for" or "while"
+    pub cond_sub: &'a str,
+    pub cond_add: &'a str,
+    pub block: String,
 }
 
 pub fn while_or_for(input: &str) -> Vec<WhileOrFor> {
-    todo!()
+    let mut ret = Vec::new();
+    let mut iter = input.lines().peekable();
+    while let Some(cur) = iter.next() {
+        let nxt = iter.peek();
+        if let Some(nxt) = nxt {
+            if !(cur.starts_with('-') && nxt.starts_with('+')) {
+                continue
+            }
+            // dbg!(cur);
+            // dbg!(nxt);
+            let (_sub, cur_1) = cur.split_at(1);
+            let (_add, nxt_1) = nxt.split_at(1);
+            if !cur_1.trim().starts_with("while") && !cur_1.trim().starts_with("for") {
+                continue
+            }
+            // dbg!(cur_1);
+            let idx_start = cur_1.find("(");
+            let idx_end = cur_1.rfind(")");
+            let idx_start_2 = nxt_1.find("(");
+            let idx_end_2 = nxt_1.rfind(")");
+            if let (Some(idx_start), Some(idx_end), Some(idx_start_2), Some(idx_end_2)) = 
+                (idx_start, idx_end, idx_start_2, idx_end_2) 
+            {
+                let (mark, _rem) = cur_1.split_at(idx_start);
+                let mark = mark.trim();
+                let cond_sub = &cur_1[(idx_start + 1)..idx_end];
+                let cond_add = &nxt_1[(idx_start_2 + 1)..idx_end_2];
+                // dbg!(mark);
+                // dbg!(cond_sub);
+                // dbg!(cond_add);
+                let ans = WhileOrFor {
+                    mark,
+                    cond_sub,
+                    cond_add,
+                    block: String::new(),
+                };
+                ret.push(ans);
+            }
+        } else {
+            continue
+        }
+    }
+    ret
 }
 
 /*
