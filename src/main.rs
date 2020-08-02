@@ -2,28 +2,52 @@ mod app;
 mod parse;
 mod format;
 
-use std::fs::File;
+use std::fs::{self, File};
+use std::path::Path;
 use std::io::{Result, Read};
 
 fn main() -> Result<()> {
     let params = app::params();
     
-    println!("Using input file name: {}", params.input);
+    println!("Using input : {}", params.input);
+    let path = Path::new(&params.input);
     
-    let mut file = File::open(params.input)?;
+    if path.is_file() {
+        let mut file = File::open(path)?;
 
-    let mut content = String::new();
-    file.read_to_string(&mut content)?;
+        let mut content = String::new();
+        file.read_to_string(&mut content)?;
+    
+        let code_slices = parse::code_slices(&content);
+    
+        for a in code_slices {
+            println!("new code slice!");
+            for i in format::add_if_return(a) {
+                println!("{}", i.condition);
+            }
+        }
+    } else {
+        println!("input is a folder");
+        for dirent in fs::read_dir(path)? {
+            let dirent = dirent?;
+            dbg!(dirent.path());
+                
+            let mut file = File::open(dirent.path())?;
 
-    let code_slices = parse::code_slices(&content);
-
-    for a in code_slices {
-        println!("new code slice!");
-        for i in format::add_if_return(a) {
-            println!("{}", i.condition);
+            let mut content = String::new();
+            file.read_to_string(&mut content)?;
+        
+            let code_slices = parse::code_slices(&content);
+        
+            for a in code_slices {
+                println!("new code slice!");
+                for i in format::add_if_return(a) {
+                    dbg!(i);
+                }
+            }
         }
     }
-
     Ok(())
 }
+
 

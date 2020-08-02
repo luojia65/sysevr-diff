@@ -18,6 +18,7 @@ fn add_lines(input: &str) -> impl Iterator<Item = &str> {
         })
 }
 
+#[derive(Debug)]
 pub struct AddIfReturn<'a> {
     pub condition: &'a str
 }
