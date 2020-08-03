@@ -20,7 +20,7 @@ fn add_lines(input: &str) -> impl Iterator<Item = &str> {
 
 #[derive(Clone, Debug)]
 pub struct AddIfReturn<'a> {
-    pub condition: &'a str
+    pub cond: &'a str,
 }
 
 pub fn add_if_return(input: &str) -> Vec<AddIfReturn> {
@@ -32,7 +32,7 @@ pub fn add_if_return(input: &str) -> Vec<AddIfReturn> {
             let idx_end = last_line.rfind(")");
             if let (Some(idx_start), Some(idx_end)) = (idx_start, idx_end) {
                 let mat = AddIfReturn {
-                    condition: &last_line[(idx_start + 1)..idx_end]
+                    cond: &last_line[(idx_start + 1)..idx_end],
                 };
                 ans.push(mat)
             }
@@ -60,6 +60,7 @@ pub struct ModifyWhileFor<'a> {
 pub fn modify_while_for(input: &str) -> Vec<ModifyWhileFor> {
     let mut ret = Vec::new();
     let mut iter = input.lines().peekable();
+    let mut i = 0;
     while let Some(cur) = iter.next() {
         let nxt = iter.peek();
         if let Some(nxt) = nxt {
@@ -99,6 +100,8 @@ pub fn modify_while_for(input: &str) -> Vec<ModifyWhileFor> {
         } else {
             continue
         }
+        i += cur.len();
+        dbg!(i);
     }
     ret
 }
