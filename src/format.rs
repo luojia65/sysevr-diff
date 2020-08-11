@@ -19,11 +19,13 @@ fn add_lines(input: &str) -> impl Iterator<Item = &str> {
 }
 
 #[derive(Clone, Debug)]
-pub struct AddIfReturn {
+pub struct AddIfReturn<'a> {
     pub cond: String,
+    pub input: &'a str,
+    pub idx: usize,
 }
 
-pub fn add_if_return(input: &str) -> Vec<AddIfReturn> {
+pub fn add_if_return<'a>(input: &'a str) -> Vec<AddIfReturn<'a>> {
     let mut ret = Vec::new();
     let mut cur = 0;
     loop { 
@@ -70,7 +72,7 @@ pub fn add_if_return(input: &str) -> Vec<AddIfReturn> {
         }
         // dbg!(&cond_add);
         
-        let ans = AddIfReturn { cond };
+        let ans = AddIfReturn { cond, input, idx: cur };
         ret.push(ans);
     }
     ret
