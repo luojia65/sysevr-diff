@@ -5,6 +5,6 @@ pub struct Cv<'a> {
     pub var_name: &'a str,
 }
 
-pub fn gen_add_if_return<'a>(a: AddIfReturn, src: &'a str) -> Cv<'a> {
+pub fn gen_add_if_return<'a>(a: AddIfReturn, src: &'a str) -> Vec<Cv<'a>> {
     todo!()
 }

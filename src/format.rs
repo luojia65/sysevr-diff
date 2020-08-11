@@ -19,27 +19,61 @@ fn add_lines(input: &str) -> impl Iterator<Item = &str> {
 }
 
 #[derive(Clone, Debug)]
-pub struct AddIfReturn<'a> {
-    pub cond: &'a str,
+pub struct AddIfReturn {
+    pub cond: String,
 }
 
 pub fn add_if_return(input: &str) -> Vec<AddIfReturn> {
-    let mut last_line = "";
-    let mut ans = Vec::new();
-    for line in add_lines(input) {
-        if last_line.trim().starts_with("if") && line.trim().starts_with("return") {
-            let idx_start = last_line.find("(");
-            let idx_end = last_line.rfind(")");
-            if let (Some(idx_start), Some(idx_end)) = (idx_start, idx_end) {
-                let mat = AddIfReturn {
-                    cond: &last_line[(idx_start + 1)..idx_end],
-                };
-                ans.push(mat)
+    let mut ret = Vec::new();
+    let mut cur = 0;
+    loop { 
+        cur = next_line(input, cur);
+        if cur >= input.len() {
+            break
+        }
+        let nxt = next_line(input, cur);
+        if nxt >= input.len() {
+            break
+        }
+        let cur_str = &input[cur..nxt]; 
+        if !cur_str.starts_with('+') {
+            continue
+        }
+        let (_add_sym, add) = cur_str.split_at(1);
+        if !add.trim().starts_with("if") {
+            continue
+        }
+        let idx_start_add = add.find("(");
+        let idx_end_add = add.rfind(")");
+        let cond = if let (Some(idx_start_add), Some(idx_end_add)) = (idx_start_add, idx_end_add) {
+            &add[idx_start_add + 1 ..= idx_end_add - 1]
+        } else {
+            continue;
+        }.to_string();
+        if idx_start_add == None {
+            continue;
+        }
+        let idx_start_add = idx_start_add.unwrap() + cur + 2;
+        let mut line_start = idx_start_add;
+        let mut line_end = line_start;
+        let mut cond_add = String::new();
+        let nxt_line = &input[line_start..next_line(input, line_start)];
+        loop {
+            line_end = next_line(input, line_start);
+            let nxt_line = &input[line_start..line_end];
+            if nxt_line.starts_with('+') { 
+                cond_add += &nxt_line[1..];
+                line_start = line_end;
+            } else {
+                break
             }
         }
-        last_line = line;
+        // dbg!(&cond_add);
+        
+        let ans = AddIfReturn { cond };
+        ret.push(ans);
     }
-    ans
+    ret
 } 
 
 /*
