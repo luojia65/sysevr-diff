@@ -255,6 +255,8 @@ pub fn modify_if(input: &str) -> Vec<ModifyIf> {
                 continue;
             }
             skip = idx_start_add.unwrap();
+        } else {
+            continue
         }
         loop {
             line_end = next_line(input, line_start);
