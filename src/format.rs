@@ -160,50 +160,120 @@ pub fn modify_while_for(input: &str) -> Vec<ModifyWhileFor> {
 }
 
 #[derive(Clone, Debug)]
-pub struct ModifyIf<'a> {
-    pub cond_sub: &'a str,
-    pub cond_add: &'a str,
+pub struct ModifyIf {
+    pub cond_sub: String,
+    pub cond_add: String,
+    pub block: String,
 }
 
 pub fn modify_if(input: &str) -> Vec<ModifyIf> {
     let mut ret = Vec::new();
-    let mut iter = input.lines().peekable();
-    while let Some(cur) = iter.next() {
-        let nxt = iter.peek();
-        if let Some(nxt) = nxt {
-            if !(cur.starts_with('-') && nxt.starts_with('+')) {
-                continue
-            }
-            // dbg!(cur);
-            // dbg!(nxt);
-            let (_sub, cur_1) = cur.split_at(1);
-            let (_add, nxt_1) = nxt.split_at(1);
-            if !cur_1.trim().starts_with("if") {
-                continue
-            }
-            // dbg!(cur_1);
-            let idx_start = cur_1.find("(");
-            let idx_end = cur_1.rfind(")");
-            let idx_start_2 = nxt_1.find("(");
-            let idx_end_2 = nxt_1.rfind(")");
-            if let (Some(idx_start), Some(idx_end), Some(idx_start_2), Some(idx_end_2)) = 
-                (idx_start, idx_end, idx_start_2, idx_end_2) 
-            {
-                let cond_sub = &cur_1[(idx_start + 1)..idx_end];
-                let cond_add = &nxt_1[(idx_start_2 + 1)..idx_end_2];
-                // dbg!(mark);
-                // dbg!(cond_sub);
-                // dbg!(cond_add);
-                let ans = ModifyIf {
-                    cond_sub,
-                    cond_add,
-                    // block: String::new(), // todo
-                };
-                ret.push(ans);
-            }
-        } else {
+    
+    let mut cur = 0;
+    loop { 
+        cur = next_line(input, cur);
+        if cur >= input.len() {
+            break
+        }
+        let nxt = next_line(input, cur);
+        if nxt >= input.len() {
+            break
+        }
+        let cur_str = &input[cur..nxt]; 
+        if !cur_str.starts_with('-') {
             continue
         }
+        let (_sub_sym, sub) = cur_str.split_at(1);
+        if !sub.trim().starts_with("if") {
+            continue
+        }
+        let idx_start_sub = sub.find("(");
+        if idx_start_sub == None {
+            continue;
+        }
+        let idx_start_sub = idx_start_sub.unwrap() + cur + 2;
+        let mut cond_sub = String::new();
+        cond_sub += &input[idx_start_sub..nxt];
+        let mut line_start = nxt;
+        let mut line_end = nxt; // not necessary
+        let mut depth = 0; // 括号的深度
+        loop {
+            line_end = next_line(input, line_start);
+            let nxt_line = &input[line_start..line_end];
+            if nxt_line.starts_with('-') {
+                cond_sub += &nxt_line[1..];
+                line_start = line_end;   
+            } else {
+                break
+            }
+        }
+        // dbg!(cond_sub);
+        let mut cond_add = String::new();
+        let nxt_line = &input[line_start..next_line(input, line_start)];
+        let mut skip = 0;
+        if nxt_line.starts_with('+') {
+            if !&nxt_line[1..].trim().starts_with("if") {
+                continue
+            }
+            // dbg!(nxt_line);
+            let idx_start_add = nxt_line.find("(");
+            if idx_start_add == None {
+                continue;
+            }
+            skip = idx_start_add.unwrap();
+        }
+        loop {
+            line_end = next_line(input, line_start);
+            let nxt_line = &input[line_start..line_end];
+            if nxt_line.starts_with('+') { 
+                cond_add += &nxt_line[1..][skip..];
+                line_start = line_end;
+            } else {
+                break
+            }
+            if skip != 0 {
+                skip = 0;
+            }
+        }
+        // dbg!(cond_add);
+        let mut begin = line_start; // +1 = ")"
+        let mut end = begin;
+        let mut depth = 0;
+        let mut has_region_mark = true; // 有没有大括号
+        loop {
+            if end >= input.len() {
+                break
+            }
+            let cur_ch = &input[end..end+1];
+            // dbg!(&input[begin..end]);
+            if cur_ch.trim() == "" {
+                end += 1;
+                continue // 空字符，可以是空格或者换行，跳过
+            }
+            // dbg!(cur_ch, begin, end);
+            if !has_region_mark && cur_ch == ";" {
+                end += 1; // 包含这个分号
+                break
+            }
+            if depth == 0 && cur_ch != "{" {
+                has_region_mark = false; // 没有最大的大括号的特殊情况
+                // dbg!(has_region_mark); // false
+            }
+            if cur_ch == "{" {
+                depth += 1;
+            }
+            if cur_ch == "}" {
+                depth -= 1;
+            }
+            if depth == 0 && has_region_mark {
+                break
+            }
+            end += 1;
+        }
+        let block = (&input[begin..end].trim()).to_string();
+        
+        let ans = ModifyIf { cond_sub, cond_add, block };
+        ret.push(ans);
     }
     ret
 }
