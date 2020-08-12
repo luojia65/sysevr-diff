@@ -32,25 +32,51 @@ impl<'a> Iterator for GetSyms<'a> {
         if self.cur == "" {
             return None
         }
-        let mut ans_idx = 0;
-        let ch_cur = &self.cur[ans_idx..ans_idx+1];
-        if ch_cur == "-" {
-            if ans_idx+1 < self.cur.len() {
-                if &self.cur[ans_idx+1..ans_idx+2] == ">" {
-                    self.cur = &self.cur[2..];
-                    return Some("->")
-                } 
-            } 
-            self.cur = &self.cur[1..];
-            return Some("-")
+        let mut end = 0;
+        let first_ch = &self.cur[0..=0];
+        #[derive(Copy, Clone, Eq, PartialEq)]
+        enum Ty {
+            Number,
+            Ident,
+            Symbol,
         }
-        match ch_cur {
-            "+" | ">" | "<" => {
-                self.cur = &self.cur[1..];
-                return Some(ch_cur)
-            } 
-            _ => {} // todo
+        let first_ty = match first_ch {
+            "+" | "-" | "*" | "/" | "%" | ">" | "<" | "=" => Ty::Symbol,
+            "0" | "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9" => Ty::Number,
+            _ => Ty::Ident,
+        };
+        loop {
+            if end >= self.cur.len() {
+                break
+            }
+            let cur_ch = &self.cur[end..=end];
+            match cur_ch {
+                "+" | "-" | "*" | "/" | "%" | ">" | "<" | "=" => {
+                    if let Ty::Symbol = first_ty {
+                        end += 1;
+                        continue
+                    } else {
+                        break
+                    }
+                }
+                "0" | "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9" => {
+                    if let Ty::Number = first_ty {
+                        end += 1;
+                        continue
+                    } else {
+                        break
+                    }
+                }
+                _ => {
+                    if let Ty::Ident = first_ty {
+                        end += 1;
+                        continue
+                    } else {
+                        break
+                    }
+                }
+            }
         }
-        todo!("a tokenizer")
+        Some(&self.cur[..end])
     }
 }
