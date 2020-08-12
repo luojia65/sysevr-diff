@@ -11,14 +11,17 @@ pub struct Cv<'a> {
 // a || b，继续寻找a或者b
 // a op b，是a
 // (a)，继续寻找a
-pub fn gen_add_if_return(a: AddIfReturn) -> Vec<Cv> {
+pub fn gen_add_if_return<'a>(a: &'a AddIfReturn) -> Vec<Cv<'a>> {
     let mut ret = Vec::new();
-    
+    for sym in get_syms(&a.cond) {
+        dbg!(&sym);
+    }
     
     ret
 }
 
 // 输出："s", "->", "start_addr", "<", "0"等等
+#[derive(Debug)]
 struct GetSyms<'a> {
     cur: &'a str
 }
@@ -26,7 +29,7 @@ fn get_syms(input: &str) -> GetSyms {
     GetSyms{ cur: input }
 }
 impl<'a> Iterator for GetSyms<'a> {
-    type Item = &'a str;
+    type Item = String;
     fn next(&mut self) -> Option<Self::Item> {
         self.cur = self.cur.trim();
         if self.cur == "" {
@@ -41,8 +44,9 @@ impl<'a> Iterator for GetSyms<'a> {
             Symbol,
         }
         let first_ty = match first_ch {
-            "+" | "-" | "*" | "/" | "%" | ">" | "<" | "=" => Ty::Symbol,
+            "+" | "-" | "*" | "/" | "%" | ">" | "<" | "=" | "(" | ")" | "," => Ty::Symbol,
             "0" | "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9" => Ty::Number,
+            " " | "\r" | "\n" => unreachable!(),
             _ => Ty::Ident,
         };
         loop {
@@ -51,7 +55,7 @@ impl<'a> Iterator for GetSyms<'a> {
             }
             let cur_ch = &self.cur[end..=end];
             match cur_ch {
-                "+" | "-" | "*" | "/" | "%" | ">" | "<" | "=" => {
+                "+" | "-" | "*" | "/" | "%" | ">" | "<" | "=" | "(" | ")" | "," => {
                     if let Ty::Symbol = first_ty {
                         end += 1;
                         continue
@@ -67,6 +71,7 @@ impl<'a> Iterator for GetSyms<'a> {
                         break
                     }
                 }
+                " " | "\r" | "\n" => break,
                 _ => {
                     if let Ty::Ident = first_ty {
                         end += 1;
@@ -77,6 +82,8 @@ impl<'a> Iterator for GetSyms<'a> {
                 }
             }
         }
-        Some(&self.cur[..end])
+        let ans = String::from(&self.cur[..end]);
+        self.cur = &self.cur[end..];
+        Some(ans)
     }
 }

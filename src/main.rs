@@ -44,6 +44,7 @@ fn main() -> Result<()> {
                 println!("new code slice!");
                 for i in format::add_if_return(a) {
                     // dbg!(&i.input[i.idx ..= i.idx + 10]); // "+ if ...."
+                    cv::gen_add_if_return(&i);
                     dbg!(i);
                 }
                 for i in format::modify_while_for(a) {

@@ -231,8 +231,7 @@ pub fn modify_if(input: &str) -> Vec<ModifyIf> {
         let mut cond_sub = String::new();
         cond_sub += &input[idx_start_sub..nxt];
         let mut line_start = nxt;
-        let mut line_end = nxt; // not necessary
-        let mut depth = 0; // 括号的深度
+        let mut line_end; // not necessary
         loop {
             line_end = next_line(input, line_start);
             let nxt_line = &input[line_start..line_end];
