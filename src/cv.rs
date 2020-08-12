@@ -36,10 +36,20 @@ impl<'a> Iterator for GetSyms<'a> {
         let ch_cur = &self.cur[ans_idx..ans_idx+1];
         if ch_cur == "-" {
             if ans_idx+1 < self.cur.len() {
-
-            } else {
-                
-            }
+                if &self.cur[ans_idx+1..ans_idx+2] == ">" {
+                    self.cur = &self.cur[2..];
+                    return Some("->")
+                } 
+            } 
+            self.cur = &self.cur[1..];
+            return Some("-")
+        }
+        match ch_cur {
+            "+" | ">" | "<" => {
+                self.cur = &self.cur[1..];
+                return Some(ch_cur)
+            } 
+            _ => {} // todo
         }
         todo!("a tokenizer")
     }
