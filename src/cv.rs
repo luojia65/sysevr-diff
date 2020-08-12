@@ -1,6 +1,6 @@
 use crate::format::*;
 
-pub struct Cv {
+pub struct Cv<'a> {
     pub name: String,
     pub input: &'a str,
     pub idx: usize
@@ -13,7 +13,7 @@ pub struct Cv {
 // (a)，继续寻找a
 pub fn gen_add_if_return(a: AddIfReturn) -> Vec<Cv> {
     let mut ret = Vec::new();
-
+    
     
     ret
 }
@@ -33,12 +33,12 @@ impl<'a> Iterator for GetSyms<'a> {
             return None
         }
         let mut ans_idx = 0;
-        let ch_cur = self.cur[ans_idx..ans_idx+1];
+        let ch_cur = &self.cur[ans_idx..ans_idx+1];
         if ch_cur == "-" {
             if ans_idx+1 < self.cur.len() {
 
             } else {
-                break
+                
             }
         }
         todo!("a tokenizer")
