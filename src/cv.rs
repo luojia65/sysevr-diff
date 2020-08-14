@@ -152,9 +152,18 @@ impl<'a> Iterator for GetSyms<'a> {
     }
 }
 
+// 循环条件的变量
+// while(len > 0) => while(len > = && --maxloop > 0) ==> maxloop
+// 循环条件内部修改了赋值的变量
+// cmd_start =... => cmd_start
+pub fn gen_while_for<'a>(a: &'a ModifyWhileFor) -> Vec<Cv<'a>> {
+    let mut ret = Vec::new();
+
+    ret
+}
+// 也是运算符左侧的变量
 //
-//
-pub fn gen_modify_if<'a>(a: &ModifyIf) -> Vec<Cv<'a>> {
+pub fn gen_modify_if<'a>(a: &'a ModifyIf) -> Vec<Cv<'a>> {
     let mut ret = Vec::new();
 
     ret
