@@ -23,17 +23,27 @@ pub fn gen_add_if_return<'a>(a: &'a AddIfReturn) -> Vec<Cv<'a>> {
 // 输出："s", "->", "start_addr", "<", "0"等等
 #[derive(Debug)]
 struct GetSyms<'a> {
-    cur: &'a str
+    cur: &'a str,
+    idx: usize,
 }
 fn get_syms(input: &str) -> GetSyms {
-    GetSyms{ cur: input }
+    GetSyms{ cur: input, idx: 0 }
 }
 impl<'a> Iterator for GetSyms<'a> {
-    type Item = String;
+    type Item = (usize, String);
     fn next(&mut self) -> Option<Self::Item> {
-        self.cur = self.cur.trim();
-        if self.cur == "" {
-            return None
+        loop {
+            if self.cur == "" {
+                return None
+            }
+            let (head, rem) = self.cur.split_at(1);
+            if head.trim() == "" {
+                // dbg!(&head, &rem);
+                self.cur = rem;
+                self.idx += 1;
+            } else {
+                break
+            }
         }
         let mut end = 0;
         let first_ch = &self.cur[0..=0];
@@ -84,6 +94,7 @@ impl<'a> Iterator for GetSyms<'a> {
         }
         let ans = String::from(&self.cur[..end]);
         self.cur = &self.cur[end..];
-        Some(ans)
+        self.idx += end;
+        Some((self.idx, ans))
     }
 }

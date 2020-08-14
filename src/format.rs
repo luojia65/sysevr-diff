@@ -25,6 +25,18 @@ pub struct AddIfReturn<'a> {
     pub idx: usize,
 }
 
+impl AddIfReturn<'_> {
+    pub fn line_number(&self) -> usize {
+        let mut ans = 0;
+        for i in self.input[..self.idx].chars() {
+            if i == '\n' {
+                ans += 1;
+            }
+        }
+        ans
+    }
+}
+
 pub fn add_if_return<'a>(input: &'a str) -> Vec<AddIfReturn<'a>> {
     let mut ret = Vec::new();
     let mut cur = 0;
