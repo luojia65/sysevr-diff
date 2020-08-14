@@ -64,13 +64,14 @@ pub fn add_if_return<'a>(input: &'a str) -> Vec<AddIfReturn<'a>> {
         } else {
             continue;
         }.to_string();
+        // dbg!(&cond);
         if idx_start_add == None {
             continue;
         }
         let idx_start_add = idx_start_add.unwrap() + cur + 2;
         let mut line_start = idx_start_add;
         let mut line_end = line_start;
-        let mut cond_add = String::new();
+        let mut cond_add = String::from(&cond);
         let nxt_line = &input[line_start..next_line(input, line_start)];
         loop {
             line_end = next_line(input, line_start);
@@ -160,7 +161,7 @@ pub fn modify_while_for(input: &str) -> Vec<ModifyWhileFor> {
             let cond_add = &add[(idx_start_add + 1)..idx_end_add];
             // dbg!(cond_sub, cond_add); // cond_sub = "len > 0" cond_add = "len > 0 && --maxloop > 0"
             // dbg!(&add[idx_end_add+1..idx_end_add+2]); // +0..=+1 = ")"
-            let mut begin = nxt + idx_end_add + 2; // +1 = ")"
+            let begin = nxt + idx_end_add + 2; // +1 = ")"
             let mut end = begin;
             let mut depth = 0;
             let mut has_region_mark = true; // 有没有大括号
@@ -285,7 +286,7 @@ pub fn modify_if(input: &str) -> Vec<ModifyIf> {
             }
         }
         // dbg!(cond_add);
-        let mut begin = line_start; // +1 = ")"
+        let begin = line_start; // +1 = ")"
         let mut end = begin;
         let mut depth = 0;
         let mut has_region_mark = true; // 有没有大括号

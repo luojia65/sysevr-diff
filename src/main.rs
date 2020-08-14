@@ -48,13 +48,13 @@ fn main() -> Result<()> {
                     dbg!(cv_list);
                 }
                 for i in format::modify_while_for(a) {
-                    dbg!(i);
+                    // dbg!(i);
                 }
                 for i in format::modify_if(a) {
-                    dbg!(i);
+                    // dbg!(i);
                 }
                 for i in format::modify_value_assign(a) {
-                    dbg!(i);
+                    // dbg!(i);
                 }
             }
         }

@@ -14,38 +14,53 @@ pub struct Cv<'a> {
 // (a)，继续寻找a
 pub fn gen_add_if_return<'a>(a: &'a AddIfReturn) -> Vec<Cv<'a>> {
     let mut ret = Vec::new();
-    let mut syms = get_syms(&a.cond).peekable();
-    while let Some((cur_idx, cur_str)) = syms.next() {
-        if let Some((_nxt_idx, nxt_str)) = syms.peek() {
+    let syms = get_syms(&a.cond).collect::<Vec<_>>();
+    // dbg!(&syms);
+    for i in 0..syms.len() {
+        if syms.len() - i >= 2 {
+            let (cur_idx, cur_str) = syms[i].clone();
+            let (_nxt_idx, nxt_str) = syms[i + 1].clone();
             if is_ident(&cur_str) && is_cv_sym(&nxt_str) {
+                // dbg!(&cur_str, &nxt_str);
                 let cv = Cv { 
                     name: cur_str,
                     input: a.input,
                     idx: cur_idx
                 };
-                ret.push(cv)
+                ret.push(cv);
             }
-        } else {
-            // empty
+        } else if syms.len() - i >= 4 {
+            let (par_idx, par_str) = syms[i].clone();
+            let (_, arrow_str) = syms[i + 1].clone();
+            let (_, child_str) = syms[i + 2].clone();
+            let (_, sym_str) = syms[i + 3].clone();
+            if is_ident(&par_str) && arrow_str == "->" && is_ident(&child_str) && is_cv_sym(&sym_str) {
+                let cv = Cv { 
+                    name: par_str + "->" + &child_str,
+                    input: a.input,
+                    idx: par_idx
+                };
+                ret.push(cv);
+            }
         }
     }
     ret
 }
 
-fn is_digit(input: &str) -> bool {
-    input.chars().all(|e| e.is_digit(10))
-}
+// fn is_digit(input: &str) -> bool {
+//     input.chars().all(|e| e.is_digit(10))
+// }
 
 // 这个规则是自己规定的
 fn is_cv_sym(input: &str) -> bool {
     match input {
-        "+" | "-" | "*" | "/" | "%" | "<" | ">" | "<=" | ">=" | ")" => true,
+        "+" | "-" | "*" | "/" | "%" | "<" | ">" | "<=" | ">=" | ")" | "," => true,
         _ => false,
     }
 }
 
 fn is_ident(input: &str) -> bool {
-    input.chars().all(|e| e.is_alphabetic())
+    input.chars().all(|e| e.is_alphabetic() || e == '_')
 }
 
 // 输出："s", "->", "start_addr", "<", "0"等等
