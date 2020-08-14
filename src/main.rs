@@ -43,7 +43,6 @@ fn main() -> Result<()> {
             for a in code_slices {
                 println!("new code slice!");
                 for i in format::add_if_return(a) {
-                    // dbg!(&i.input[i.idx ..= i.idx + 10]); // "+ if ...."
                     let cv_list = cv::gen_add_if_return(&i);
                     dbg!(cv_list);
                 }
@@ -51,7 +50,8 @@ fn main() -> Result<()> {
                     // dbg!(i);
                 }
                 for i in format::modify_if(a) {
-                    // dbg!(i);
+                    cv::gen_modify_if(&i);
+                    dbg!(i);
                 }
                 for i in format::modify_value_assign(a) {
                     // dbg!(i);

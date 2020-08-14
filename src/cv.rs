@@ -1,10 +1,20 @@
 use crate::format::*;
 
-#[derive(Debug)]
 pub struct Cv<'a> {
     pub name: String,
     pub input: &'a str,
     pub idx: usize
+}
+
+use core::fmt;
+impl fmt::Debug for Cv<'_> {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.debug_struct("Cv")
+         .field("name", &self.name)
+         .field("idx", &self.idx)
+         .field("input(len)", &self.input.len())
+         .finish()
+    }
 }
 
 // 左边的变量就可以了
@@ -140,4 +150,12 @@ impl<'a> Iterator for GetSyms<'a> {
         self.idx += end;
         Some((self.idx, ans))
     }
+}
+
+//
+//
+pub fn gen_modify_if<'a>(a: &ModifyIf) -> Vec<Cv<'a>> {
+    let mut ret = Vec::new();
+
+    ret
 }
