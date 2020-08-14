@@ -1,5 +1,6 @@
 use crate::format::*;
 
+#[derive(Debug)]
 pub struct Cv<'a> {
     pub name: String,
     pub input: &'a str,
@@ -13,11 +14,38 @@ pub struct Cv<'a> {
 // (a)，继续寻找a
 pub fn gen_add_if_return<'a>(a: &'a AddIfReturn) -> Vec<Cv<'a>> {
     let mut ret = Vec::new();
-    for sym in get_syms(&a.cond) {
-        dbg!(&sym);
+    let mut syms = get_syms(&a.cond).peekable();
+    while let Some((cur_idx, cur_str)) = syms.next() {
+        if let Some((_nxt_idx, nxt_str)) = syms.peek() {
+            if is_ident(&cur_str) && is_cv_sym(&nxt_str) {
+                let cv = Cv { 
+                    name: cur_str,
+                    input: a.input,
+                    idx: cur_idx
+                };
+                ret.push(cv)
+            }
+        } else {
+            // empty
+        }
     }
-    
     ret
+}
+
+fn is_digit(input: &str) -> bool {
+    input.chars().all(|e| e.is_digit(10))
+}
+
+// 这个规则是自己规定的
+fn is_cv_sym(input: &str) -> bool {
+    match input {
+        "+" | "-" | "*" | "/" | "%" | "<" | ">" | "<=" | ">=" | ")" => true,
+        _ => false,
+    }
+}
+
+fn is_ident(input: &str) -> bool {
+    input.chars().all(|e| e.is_alphabetic())
 }
 
 // 输出："s", "->", "start_addr", "<", "0"等等
