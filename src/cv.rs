@@ -156,14 +156,22 @@ impl<'a> Iterator for GetSyms<'a> {
 // while(len > 0) => while(len > = && --maxloop > 0) ==> maxloop
 // 循环条件内部修改了赋值的变量
 // cmd_start =... => cmd_start
-pub fn gen_while_for<'a>(a: &'a ModifyWhileFor) -> Vec<Cv<'a>> {
+pub fn gen_while_for<'a>(ctx: &'a ModifyWhileFor) -> Vec<Cv<'a>> {
     let mut ret = Vec::new();
+    let a = get_syms(ctx.cond_sub).collect::<Vec<_>>();
+    let b = get_syms(ctx.cond_add).collect::<Vec<_>>();
+    let mut dp = vec![0; a.len() * b.len()];
+    for (i, ca) in a.iter().enumerate() {
+        for (j, cb) in b.iter().enumerate() {
+
+        }
+    }
 
     ret
 }
 // 也是运算符左侧的变量
 //
-pub fn gen_modify_if<'a>(a: &'a ModifyIf) -> Vec<Cv<'a>> {
+pub fn gen_modify_if<'a>(ctx: &'a ModifyIf) -> Vec<Cv<'a>> {
     let mut ret = Vec::new();
 
     ret
@@ -197,16 +205,17 @@ fn main() {
             break
         }
         if ca == cb {
-            print!("{}", ca);
             sa.next();
             sb.next();
             i -= 1;
             j -= 1;
         } else {
             if dp[i*lb + j - 1] > dp[(i-1)*lb + j] {
+            println!("{}", cb);
                 sb.next();
                 j -= 1;
             } else {
+            println!("  {}", ca);
                 sa.next();
                 i -= 1;
             }
