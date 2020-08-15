@@ -168,3 +168,50 @@ pub fn gen_modify_if<'a>(a: &'a ModifyIf) -> Vec<Cv<'a>> {
 
     ret
 }
+
+/* 行内diff
+fn main() {
+    let a = "abcdefg";
+    let b = "nbncueig";
+    let la = a.chars().count();
+    let lb = b.chars().count();
+    let mut dp = vec![0; la * lb];
+    for (i, ca) in a.chars().enumerate() {
+        for (j, cb) in b.chars().enumerate() {
+            if i > 0 && j > 0 && ca == cb {
+                dp[i*lb + j] = dp[(i - 1)*lb + j - 1] + 1
+            } else if i > 0 && j > 0 {
+                dp[i*lb + j] = usize::max(dp[(i - 1)*lb + j], dp[i*lb + j - 1]);
+            }
+        }
+    }
+    for i in 0..la {
+        println!("{:?}", &dp[i*lb..(i+1)*lb]);
+    }
+    let mut sa = a.chars().rev().peekable();
+    let mut sb = b.chars().rev().peekable();
+    let mut i = la - 1;
+    let mut j = lb - 1;
+    while let (Some(ca), Some(cb)) = (sa.peek(), sb.peek()) {
+        if i == 0 && j == 0 {
+            break
+        }
+        if ca == cb {
+            print!("{}", ca);
+            sa.next();
+            sb.next();
+            i -= 1;
+            j -= 1;
+        } else {
+            if dp[i*lb + j - 1] > dp[(i-1)*lb + j] {
+                sb.next();
+                j -= 1;
+            } else {
+                sa.next();
+                i -= 1;
+            }
+        }
+    }
+}
+
+*/
