@@ -160,6 +160,8 @@ pub fn gen_while_for<'a>(ctx: &'a ModifyWhileFor) -> Vec<Cv<'a>> {
     let mut ret = Vec::new();
     let a = get_syms(ctx.cond_sub).collect::<Vec<_>>();
     let b = get_syms(ctx.cond_add).collect::<Vec<_>>();
+
+    // LCS算法第一步，得到子序列索引数组
     let (la, lb) = (a.len(), b.len());
     let mut dp = vec![0; a.len() * b.len()];
     for (i, ca) in a.iter().enumerate() {
@@ -175,7 +177,7 @@ pub fn gen_while_for<'a>(ctx: &'a ModifyWhileFor) -> Vec<Cv<'a>> {
     // for i in 0..la {
     //     println!("{:?}", &dp[i*lb..(i+1)*lb]);
     // }
-
+    // LCS第二步，得到有差别的元素。注意的是这个算法是从后往前倒着输出的
     let mut sa = a.iter().rev().peekable();
     let mut sb = b.iter().rev().peekable();
     let mut i = la - 1;
