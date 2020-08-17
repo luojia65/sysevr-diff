@@ -107,7 +107,7 @@ impl<'a> Iterator for GetSyms<'a> {
             Symbol,
         }
         let first_ty = match first_ch {
-            "+" | "-" | "*" | "/" | "%" | ">" | "<" | "=" | "(" | ")" | "," => Ty::Symbol,
+            "+" | "-" | "*" | "/" | "%" | ">" | "<" | "=" | "(" | ")" | "[" | "]" | "," | "&" => Ty::Symbol,
             "0" | "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9" => Ty::Number,
             " " | "\r" | "\n" => unreachable!(),
             _ => Ty::Ident,
@@ -118,7 +118,7 @@ impl<'a> Iterator for GetSyms<'a> {
             }
             let cur_ch = &self.cur[end..=end];
             match cur_ch {
-                "+" | "-" | "*" | "/" | "%" | ">" | "<" | "=" | "(" | ")" | "," => {
+                "+" | "-" | "*" | "/" | "%" | ">" | "<" | "=" | "(" | ")" | "[" | "]" | "," | "&" => {
                     if let Ty::Symbol = first_ty {
                         end += 1;
                         continue
@@ -201,6 +201,10 @@ pub fn gen_while_for<'a>(ctx: &'a ModifyWhileFor) -> Vec<Cv<'a>> {
             }
         }
     }
+
+    // print的是不同的部分
+    // 下面还需要从While语句块的内容来生成
+    // todo
 
     ret
 }
