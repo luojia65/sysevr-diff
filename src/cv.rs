@@ -160,10 +160,45 @@ pub fn gen_while_for<'a>(ctx: &'a ModifyWhileFor) -> Vec<Cv<'a>> {
     let mut ret = Vec::new();
     let a = get_syms(ctx.cond_sub).collect::<Vec<_>>();
     let b = get_syms(ctx.cond_add).collect::<Vec<_>>();
+    let (la, lb) = (a.len(), b.len());
     let mut dp = vec![0; a.len() * b.len()];
     for (i, ca) in a.iter().enumerate() {
         for (j, cb) in b.iter().enumerate() {
+            if i > 0 && j > 0 && ca == cb {
+                dp[i*lb + j] = dp[(i - 1)*lb + j - 1] + 1
+            } else if i > 0 && j > 0 {
+                dp[i*lb + j] = usize::max(dp[(i - 1)*lb + j], dp[i*lb + j - 1]);
+            }
+        }
+    }
 
+    // for i in 0..la {
+    //     println!("{:?}", &dp[i*lb..(i+1)*lb]);
+    // }
+
+    let mut sa = a.iter().rev().peekable();
+    let mut sb = b.iter().rev().peekable();
+    let mut i = la - 1;
+    let mut j = lb - 1;
+    while let (Some(ca), Some(cb)) = (sa.peek(), sb.peek()) {
+        if i == 0 && j == 0 {
+            break
+        }
+        if ca == cb {
+            sa.next();
+            sb.next();
+            i -= 1;
+            j -= 1;
+        } else {
+            if dp[i*lb + j - 1] > dp[(i-1)*lb + j] {
+            println!("{:?}", cb);
+                sb.next();
+                j -= 1;
+            } else {
+            println!("  {:?}", ca);
+                sa.next();
+                i -= 1;
+            }
         }
     }
 

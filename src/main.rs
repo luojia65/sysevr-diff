@@ -47,6 +47,7 @@ fn main() -> Result<()> {
                     dbg!(cv_list);
                 }
                 for i in format::modify_while_for(a) {
+                    cv::gen_while_for(&i);
                     dbg!(i);
                 }
                 for i in format::modify_if(a) {
