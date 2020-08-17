@@ -203,8 +203,18 @@ pub fn gen_while_for<'a>(ctx: &'a ModifyWhileFor) -> Vec<Cv<'a>> {
     }
 
     // print的是不同的部分
+    // 不同的部分里包含的任何变量，都是关键变量
     // 下面还需要从While语句块的内容来生成
     // todo
+
+    // 考虑一个情况：
+    /*
+    cond_sub: "p != &src[size-4]",
+    cond_add: "p != &src[size]",
+    */
+    // 这时候关键变量应该是p，因为p是受变化影响的。
+    // 我觉得这种情况往下，就是往左找到第一个比较运算符，然后再往左找第一个变量
+    // 未解决问题，后面再考虑
 
     ret
 }
