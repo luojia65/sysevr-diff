@@ -22,6 +22,13 @@ impl fmt::Debug for Cv<'_> {
 // a || b，继续寻找a或者b
 // a op b，是a
 // (a)，继续寻找a
+
+// 应该做成表达式树，只要找到<、>、<=、>=、==这些符号，
+// 这个结点的左儿子如果是字母串，它就是关键变量
+// 如果找关键变量找到一个“->”，假如它的左边和右边都是字母串，
+// 应该把左右和箭头拼接起来，看作一个关键变量
+
+// 其实从左往右扫就可以了
 pub fn gen_add_if_return<'a>(a: &'a AddIfReturn) -> Vec<Cv<'a>> {
     let mut ret = Vec::new();
     let syms = get_syms(&a.cond).collect::<Vec<_>>();
@@ -32,7 +39,7 @@ pub fn gen_add_if_return<'a>(a: &'a AddIfReturn) -> Vec<Cv<'a>> {
             let (_nxt_idx, nxt_str) = syms[i + 1].clone();
             if is_ident(&cur_str) && is_cv_sym(&nxt_str) {
                 // dbg!(&cur_str, &nxt_str);
-                let cv = Cv { 
+                let cv = Cv {
                     name: cur_str,
                     input: a.input,
                     idx: cur_idx

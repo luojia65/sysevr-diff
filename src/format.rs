@@ -40,6 +40,7 @@ impl AddIfReturn<'_> {
 pub fn add_if_return<'a>(input: &'a str) -> Vec<AddIfReturn<'a>> {
     let mut ret = Vec::new();
     let mut cur = 0;
+    // 扫描每一行
     loop { 
         cur = next_line(input, cur);
         if cur >= input.len() {
@@ -50,13 +51,17 @@ pub fn add_if_return<'a>(input: &'a str) -> Vec<AddIfReturn<'a>> {
             break
         }
         let cur_str = &input[cur..nxt]; 
+        // 如果这一行是+开始的，再继续下面的过程
         if !cur_str.starts_with('+') {
             continue
         }
+        // 把加号切掉
         let (_add_sym, add) = cur_str.split_at(1);
+        // 如果不是if语句就返回
         if !add.trim().starts_with("if") {
             continue
         }
+        // 得到条件
         let idx_start_add = add.find("(");
         let idx_end_add = add.rfind(")");
         let cond = if let (Some(idx_start_add), Some(idx_end_add)) = (idx_start_add, idx_end_add) {
@@ -84,7 +89,11 @@ pub fn add_if_return<'a>(input: &'a str) -> Vec<AddIfReturn<'a>> {
             }
         }
         // dbg!(&cond_add);
+        // todo 判断是不是return语句
+
+        // todo: log(...); return ??;
         
+        // 返回结果
         let ans = AddIfReturn { cond, input, idx: cur };
         ret.push(ans);
     }
@@ -139,14 +148,17 @@ pub fn modify_while_for(input: &str) -> Vec<ModifyWhileFor> {
         let cur_str = &input[cur..nxt]; // "-    while (len > 0) {\r\n"
         let nxtnxt = next_line(input, nxt);
         let nxt_str = &input[nxt..nxtnxt]; // "+    while (len > 0 && --maxloop > 0) {\r\n"
+        // 当前行是减号，下一行是加号，如果不是这种情况就跳过
         if !(cur_str.starts_with('-') && nxt_str.starts_with('+')) {
             continue
         }
         let (_sub_sym, sub) = cur_str.split_at(1);
         let (_add_sym, add) = nxt_str.split_at(1);
+        // 如果当前行不是while、for语句就跳过
         if !sub.trim().starts_with("while") && !sub.trim().starts_with("for") {
             continue
         }
+        // 找到循环条件，减号和加号行都要找
         let idx_start_sub = sub.find("(");
         let idx_end_sub = sub.rfind(")");
         let idx_start_add = add.find("(");
@@ -157,6 +169,7 @@ pub fn modify_while_for(input: &str) -> Vec<ModifyWhileFor> {
         {
             let (mark, _rem) = sub.split_at(idx_start_sub);
             let mark = mark.trim();
+            // 切掉括号，得到循环条件
             let cond_sub = &sub[(idx_start_sub + 1)..idx_end_sub];
             let cond_add = &add[(idx_start_add + 1)..idx_end_add];
             // dbg!(cond_sub, cond_add); // cond_sub = "len > 0" cond_add = "len > 0 && --maxloop > 0"
@@ -165,7 +178,7 @@ pub fn modify_while_for(input: &str) -> Vec<ModifyWhileFor> {
             let mut end = begin;
             let mut depth = 0;
             let mut has_region_mark = true; // 有没有大括号
-            loop {
+            loop { // 大括号匹配
                 if end >= input.len() {
                     break
                 }
@@ -336,6 +349,10 @@ pub struct ModifyValueAssign<'a> {
     pub add_right: &'a str,
 }
 
+/*
+    找到第一个减号行，第二个加号行的情况
+    如果本行的结尾是分号，而且有等号，等号往左都是变量名，往右都是值
+*/
 pub fn modify_value_assign(input: &str) -> Vec<ModifyValueAssign> {
     let mut ret = Vec::new();
     let mut iter = input.lines().peekable();
